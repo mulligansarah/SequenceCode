@@ -51,17 +51,47 @@ qiime metadata tabulate \
   --o-visualization denoising-stats.qzv
 
 
+### Generate a tree for phylogenetic diversity analyses ###
+qiime phylogeny align-to-tree-mafft-fasttree \
+  --i-sequences rep-seqs.qza \
+  --o-alignment aligned-rep-seqs.qza \
+  --o-masked-alignment masked-aligned-rep-seqs.qza \
+  --o-tree unrooted-tree.qza \
+  --o-rooted-tree rooted-tree.qza
 
+### Core Diversity Analysis - Alpha and Beta diversity ###
+qiime diversity core-metrics-phylogenetic \
+  --i-phylogeny rooted-tree.qza \
+  --i-table table.qza \
+  --p-sampling-depth 53000 \
+  --m-metadata-file sample-metadata.tsv \
+  --output-dir core-metrics-results
+
+### Alpha Rarefaction ### 
+qiime diversity alpha-rarefaction \
+  --i-table table.qza \
+  --i-phylogeny rooted-tree.qza \
+  --p-max-depth 53000 \
+  --p-metrics shannon \
+  --p-metrics faith_pd \
+  --p-metrics observed_features \
+  --p-metrics simpson_e \
+  --p-metrics simpson \
+  --p-metrics chao1 \
+  --m-metadata-file sample-metadata.tsv \
+  --o-visualization /work/sbauman/project/core-metrics/alpha-rarefaction-metrics.qzv
+
+  
 ### Taxonomic Assignments ###
 
 *** qiime2-amplicon-2023.9 ***
 
 qiime feature-classifier classify-sklearn \
-  --i-classifier /sbauman/work/project/fastq/qiime2-amplicon-2023.9/silva138-99-341-806-nb-classifier.qza \
+  --i-classifier /work/sbauman/project/fastq/silva138-99-341-806-nb-classifier.qza \
   --i-reads rep-seqs.qza \
   --p-n-jobs -2 \
   --p-reads-per-batch "User Defined" \
-  --o-classification silva-138-99-V3V4-taxonomy.qza
+  --o-classification /work/sbauman/project/fastq/silva-138-99-V3V4-taxonomy.qza
 
 qiime metadata tabulate \
   --m-input-file silva-138-99-V3V4-taxonomy.qza \
